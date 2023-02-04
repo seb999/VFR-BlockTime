@@ -1,0 +1,7 @@
+{
+  "name": "BlockTime",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
