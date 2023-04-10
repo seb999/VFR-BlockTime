@@ -88,10 +88,20 @@ export class Tab1Page {
     myLog.logBookAircraftRegistration = "SE-MIA";
     myLog.logBookDepartureTime = this.blockIn?.getHours() + ":" + this.blockIn?.getMinutes();
     myLog.logBookArrivalTime = this.blockOut?.getHours() + ":" + this.blockOut?.getMinutes();
+    myLog.logBookLanding = this.TGL;
     myLog.logBookDescription = "Take off = " + this.takeOffTime?.getHours().toString() + ":" + this.takeOffTime?.getMinutes().toString() + "\n"
       + "Landing = " + this.landingTime?.getHours().toString() + ":" + this.landingTime?.getMinutes().toString();
     myLog.logBookDate = new Date();
+    myLog.logBookTotalFlightTime = this.calculateFlightTime(myLog.logBookDepartureTime, myLog.logBookArrivalTime);
     return myLog;
+  }
+
+  calculateFlightTime = (depart: any, arrival: any) => {
+    let totalTime = 0;
+    let startTime = depart.split(':');
+    let endTime = arrival.split(':');
+    totalTime = (endTime[0] * 60 + endTime[1] * 1) - (startTime[0] * 60 + startTime[1] * 1);
+    return totalTime / 60;
   }
 
   async saveLog(log: any): Promise<Array<any>> {
@@ -118,13 +128,11 @@ export class Tab1Page {
 
   async testApp() {
     var now = new Date();
-    this.blockIn =  new Date();
+    this.blockIn = new Date();
     this.takeOffTime = new Date(new Date().setMinutes(now.getMinutes() + 5));
     this.landingTime = new Date(now.setHours(now.getHours() + 1));
+    this.TGL = 5;
     this.blockOut = new Date(new Date(new Date().setMinutes(this.landingTime.getMinutes() + 5)).setHours(this.landingTime.getHours()));
-   
-   
-
     //this.storageService.setItem<Date>("take off", this.takeOffTime);
   }
 
@@ -138,7 +146,7 @@ export class Tab1Page {
       this.latitude = position?.coords.latitude?.toFixed(4);
       this.longitude = position?.coords.longitude?.toFixed(4);
       this.altitude = position?.coords.altitude?.toFixed(2);
-      
+
       this.speed = position?.coords.speed?.valueOf();
       this.speed = this.speed != undefined ? this.speed * 1.94384449 : 0;
       this.speed = Math.round(this.speed);
@@ -148,7 +156,7 @@ export class Tab1Page {
         if (this.blockOut == null && this.landingTime != null && this.takeOffTime != null && this.blockIn != null && this.speed < limitBlockOut) {
           this.blockOut = new Date();
 
-          setTimeout(function(this: any) {
+          setTimeout(function (this: any) {
             this.clearWatch();
           }, 300);
         }
